@@ -1,21 +1,44 @@
 #!/bin/bash
 
-
+## test Homebrew
 if ! hash brew 2>/dev/null ; then
+  echo -e '[info] Installing Homebrew'
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-for prerequisite in aws wget; do
-  hash $prerequisite &> /dev/null
-  if [[ $? == 1 ]]; then
-    echo "In order to use this script, the executable \"$prerequisite\" must be installed." 1>&2; exit 70
-  fi
-done
-}
+## test Homebrew
+if ! brew tap |grep -q 'caskroom/cask' ; then
+  echo -e '[info] Tapping Caskroom'
+  brew tap caskroom/cask
+fi
 
-vagrant-omnibus $ vagrant plugin install vagrant-omnibus
-vagrant-berkshelf (>=4.0.0) $ vagrant plugin install vagrant-berkshelf
-To use vagrant-berkself, you will have to install ChefDK.
-vagrant-hosts $ vagrant plugin install vagrant-hosts
-vagrant-cachier(optional) $ vagrant plugin install vagrant-cachier
-vagrant-aws (only if you use ec2.) $ vagrant plugin install vagrant-aws
+if ! hash vagrant 2>/dev/null ; then
+  echo -e '[info] Installing Vagrant'
+  brew install vagrant
+fi
+
+## Assuming ChefDK is NOT installed..
+if [ ! -d /opt/chefdk ] ; then
+  echo -e '[info] Installing ChefrDK'
+  brew cask install chefdk --force
+fi
+
+if ! hash wget ; then
+  echo -e '[info] Installing WGet'
+  brew install wget
+fi
+
+if ! hash aws ; then
+echo -e '[info] Installing AWS CLI Tools'
+  brew install awscli
+fi
+
+PLUGINS="$(vagrant plugin list)"
+for REQ in omnibus berkshelf hosts cachier aws ; do
+  echo "${PLUGINS}" |grep  -q  "${REQ}" || {
+    echo -e "[info] Installing Plugin: ${REQ}"
+    vagrant plugin install vagrant-${REQ}
+  }
+done
+
+exit 0
