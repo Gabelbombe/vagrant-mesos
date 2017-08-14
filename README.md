@@ -24,12 +24,12 @@ Base boxes used in `Vagrantfile`s are Mesos pre-installed boxes,
 * VirtualBox: <https://www.virtualbox.org/> (not required if you use ec2.)
 * Vagrant plugins
     * [vagrant-omnibus](https://github.com/schisamo/vagrant-omnibus)
-    * [vagrant-berkshelf](https://github.com/berkshelf/vagrant-berkshelf) (>=4.0.0) [NOTE: To use vagrant-berkself, you will have to install [ChefDK](https://downloads.chef.io/chef-dk/)]
+    * [vagrant-berkshelf](https://github.com/berkshelf/vagrant-berkshelf) (>=4.0.0) [__NOTE:__ To use berkself, you will have to install [ChefDK](https://downloads.chef.io/chef-dk/)]
     * [vagrant-hosts](https://github.com/adrienthebo/vagrant-hosts)
-    * [vagrant-cachier](https://github.com/fgrehm/vagrant-cachier)(optional)
+    * [vagrant-cachier](https://github.com/fgrehm/vagrant-cachier) (optional)
     * [vagrant-aws](https://github.com/mitchellh/vagrant-aws) (only if you use ec2.)
 
-To install the above requirements you can simply run [This Installer Script](https://github.com/ehime/vagrant-mesos/blob/master/vagrant_plugin_installer.sh)
+To install the above requirements you can simply run my [dependancies  script](https://github.com/ehime/vagrant-mesos/blob/master/vagrant_plugin_installer.sh)
 
 <a name="clvb"></a>
 #### Mesos Cluster on VirtualBox
