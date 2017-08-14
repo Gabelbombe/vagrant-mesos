@@ -19,10 +19,11 @@ ninfos    = gen_node_infos(conf)
 
 ## vagrant plugins required:
 ## vagrant-aws, vagrant-berkshelf, vagrant-omnibus, vagrant-hosts, vagrant-cachier
-Vagrant.configure("2") do |config|
+Vagrant.configure("2") do | config |
   if !conf["custom_ami"] then
     ## https://vagrantcloud.com/ehime/boxes/mesos
     config.vm.box = "ehime/mesos"
+    config.vm.box_version = "1.0.0"
   end
 
   ## enable plugins
@@ -42,10 +43,10 @@ Vagrant.configure("2") do |config|
   is_plugin("vagrant-hosts")
 
   ## define VMs. all VMs have identical configuration.
-  [ninfos[:zk], ninfos[:master], ninfos[:slave]].flatten.each_with_index do |ninfo, i|
-    config.vm.define ninfo[:hostname] do |cfg|
+  [ninfos[:zk], ninfos[:master], ninfos[:slave]].flatten.each_with_index do | ninfo, i |
+    config.vm.define ninfo[:hostname] do | cfg |
 
-      cfg.vm.provider :virtualbox do |vb, override|
+      cfg.vm.provider :virtualbox do | vb, override |
         override.vm.hostname = ninfo[:hostname]
         override.vm.network :private_network, :ip => ninfo[:ip]
         override.vm.provision :hosts
@@ -53,18 +54,18 @@ Vagrant.configure("2") do |config|
         vb.name = 'vagrant-mesos-' + ninfo[:hostname]
         vb.customize ["modifyvm", :id, "--memory", ninfo[:mem], "--cpus", ninfo[:cpus] ]
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/root root"
         end
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/home/vagrant vagrant"
         end
       end
 
-      cfg.vm.provider :aws do |aws, override|
+      cfg.vm.provider :aws do | aws, override |
         aws.access_key_id = conf["access_key_id"]
         aws.secret_access_key = conf["secret_access_key"]
 
@@ -93,7 +94,7 @@ Vagrant.configure("2") do |config|
         override.ssh.username = "ubuntu"
         override.ssh.private_key_path = conf["ssh_private_key_path"]
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/home/ubuntu ubuntu"
         end
@@ -122,7 +123,7 @@ Vagrant.configure("2") do |config|
         cfg.vm.provision :shell, :inline => "mkdir -p #{master_work_dir}"
       end
 
-      cfg.vm.provision :chef_solo do |chef|
+      cfg.vm.provision :chef_solo do | chef |
 ##       chef.log_level = :debug
         chef.add_recipe "apt"
 
@@ -133,7 +134,7 @@ Vagrant.configure("2") do |config|
               :type         => "mesosphere",
               :version      => conf["mesos_version"],
               :master_ips   => ninfos[:master].map { |m| "#{m[:ip]}" },
-              :slave_ips    => ninfos[:slave].map { |s| "#{s[:ip]}" },
+              :slave_ips    => ninfos[:slave].map { | s | "#{s[:ip]}" },
               :master       => if ninfos[:zk].length > 0 then
                 {
                   :cluster => "MyCluster",
@@ -209,12 +210,12 @@ Vagrant.configure("2") do |config|
         vb.name = 'vagrant-mesos-' + "marathon"
         vb.customize ["modifyvm", :id, "--memory", conf["marathon_mem"], "--cpus", conf["marathon_cpus"] ]
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/root root"
         end
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/home/vagrant vagrant"
         end
@@ -248,7 +249,7 @@ Vagrant.configure("2") do |config|
         override.ssh.username = "ubuntu"
         override.ssh.private_key_path = conf["ssh_private_key_path"]
 
-        override.vm.provision :shell do |s|
+        override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/home/ubuntu ubuntu"
         end
