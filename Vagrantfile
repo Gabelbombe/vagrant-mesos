@@ -66,24 +66,24 @@ Vagrant.configure("2") do | config |
       end
 
       cfg.vm.provider :aws do | aws, override |
-        aws.access_key_id = conf["access_key_id"]
-        aws.secret_access_key = conf["secret_access_key"]
+        aws.access_key_id         = conf["access_key_id"]
+        aws.secret_access_key     = conf["secret_access_key"]
 
         aws.region = conf["region"]
         if conf["custom_ami"] then
-            override.vm.box = "dummy"
-            override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-            aws.ami = conf["custom_ami"]
+            override.vm.box       = "dummy"
+            override.vm.box_url   = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+            aws.ami               = conf["custom_ami"]
         end
 
         ## workaround for https://github.com/mitchellh/vagrant-aws/issues/275
-        aws.ami=""
+        aws.ami = ""
 
-        aws.instance_type = ninfo[:instance_type]
-        aws.keypair_name = conf["keypair_name"]
-        aws.subnet_id = conf["subnet_id"]
-        aws.security_groups = conf["security_groups"]
-        aws.private_ip_address = ninfo[:ip]
+        aws.instance_type         = ninfo[:instance_type]
+        aws.keypair_name          = conf["keypair_name"]
+        aws.subnet_id             = conf["subnet_id"]
+        aws.security_groups       = conf["security_groups"]
+        aws.private_ip_address    = ninfo[:ip]
         aws.tags = {
           Name: "vagrant-mesos-#{ninfo[:hostname]}"
         }
@@ -137,18 +137,18 @@ Vagrant.configure("2") do | config |
               :slave_ips    => ninfos[:slave].map { | s | "#{s[:ip]}" },
               :master       => if ninfos[:zk].length > 0 then
                 {
-                  :cluster => "MyCluster",
-                  :quorum => "#{(ninfos[:master].length.to_f/2).ceil}",
+                  :cluster  => "MyCluster",
+                  :quorum   => "#{(ninfos[:master].length.to_f/2).ceil}",
                   :work_dir => master_work_dir,
-                  :zk => "zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(", ")+"/mesos",
-                  :ip => "#{ninfo[:ip]}"
+                  :zk       => "zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(", ")+"/mesos",
+                  :ip       => "#{ninfo[:ip]}"
                 }
               else
                 {
-                  :cluster => "MyCluster",
-                  :quorum => "#{(ninfos[:master].length.to_f/2).ceil}",
+                  :cluster  => "MyCluster",
+                  :quorum   => "#{(ninfos[:master].length.to_f/2).ceil}",
                   :work_dir => master_work_dir,
-                  :ip => "#{ninfo[:ip]}"
+                  :ip       => "#{ninfo[:ip]}"
                 }
               end
             }
@@ -160,14 +160,14 @@ Vagrant.configure("2") do | config |
               :type         => "mesosphere",
               :version      => conf["mesos_version"],
               :slave        => {
-                :master       => if ninfos[:zk].length > 0 then
-                                   "zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(", ")+"/mesos"
-                                 else
-                                   "#{ninfos[:master][0][:ip]}:5050"
-                                 end,
-                :ip           => "#{ninfo[:ip]}",
-                :containerizers => "docker,mesos",
-                :isolation => "cgroups/cpu,cgroups/mem",
+                :master         => if ninfos[:zk].length > 0 then
+                                    "zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(", ")+"/mesos"
+                                  else
+                                    "#{ninfos[:master][0][:ip]}:5050"
+                                  end,
+                :ip              => "#{ninfo[:ip]}",
+                :containerizers  => "docker,mesos",
+                :isolation       => "cgroups/cpu,cgroups/mem",
                 :executor_registration_timeout => "5mins",
               }
             }
@@ -200,9 +200,9 @@ Vagrant.configure("2") do | config |
   end
 
   if conf["marathon_enable"] then
-    config.vm.define :marathon do |cfg|
+    config.vm.define :marathon do | cfg |
       marathon_ip = conf["marathon_ipbase"]+"11"
-      cfg.vm.provider :virtualbox do |vb, override|
+      cfg.vm.provider :virtualbox do | vb, override |
         override.vm.hostname = "marathon"
         override.vm.network :private_network, :ip => marathon_ip
         override.vm.provision :hosts
@@ -220,25 +220,26 @@ Vagrant.configure("2") do | config |
           s.args = "/home/vagrant vagrant"
         end
       end
-      cfg.vm.provider :aws do |aws, override|
-        aws.access_key_id = conf["access_key_id"]
-        aws.secret_access_key = conf["secret_access_key"]
+
+      cfg.vm.provider :aws do | aws, override |
+        aws.access_key_id       = conf["access_key_id"]
+        aws.secret_access_key   = conf["secret_access_key"]
 
         aws.region = conf["region"]
         if conf["custom_ami"] then
-          override.vm.box = "dummy"
-          override.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
-          aws.ami = conf["custom_ami"]
+          override.vm.box       = "dummy"
+          override.vm.box_url   = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+          aws.ami               = conf["custom_ami"]
         end
 
         ## workaround for https://github.com/mitchellh/vagrant-aws/issues/275
         aws.ami=""
 
-        aws.instance_type = conf["marathon_instance_type"]
-        aws.keypair_name = conf["keypair_name"]
-        aws.subnet_id = conf["subnet_id"]
-        aws.security_groups = conf["security_groups"]
-        aws.private_ip_address = marathon_ip
+        aws.instance_type       = conf["marathon_instance_type"]
+        aws.keypair_name        = conf["keypair_name"]
+        aws.subnet_id           = conf["subnet_id"]
+        aws.security_groups     = conf["security_groups"]
+        aws.private_ip_address  = marathon_ip
         aws.tags = {
           Name: "vagrant-mesos-marathon"
         }
