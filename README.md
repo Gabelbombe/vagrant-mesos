@@ -20,7 +20,7 @@ Base boxes used in `Vagrantfile`s are Mesos pre-installed boxes,
 
 #### Prerequisites
 
-* vagrant 1.6.5+: <http://www.vagrantup.com/>
+* Vagrant 1.6.5+: <http://www.vagrantup.com/>
 * VirtualBox: <https://www.virtualbox.org/> (not required if you use ec2.)
 * Vagrant plugins
     * [vagrant-omnibus](https://github.com/schisamo/vagrant-omnibus)
