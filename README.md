@@ -47,18 +47,18 @@ mesos_version: 0.22.1
 
 ## The numbers of servers
 ##############################
-zk_n: 1          # hostname will be zk1, zk2, …
-master_n: 1      # hostname will be master1,master2,…
-slave_n : 1      # hostname will be slave1,slave2,…
+zk_n        : 1    # hostname will be zk1, zk2, …
+master_n    : 1    # hostname will be master1,master2,…
+slave_n     : 1    # hostname will be slave1,slave2,…
 
 ## Memory and Cpus setting(only for virtualbox)
 ##########################################
-zk_mem     : 256
-zk_cpus    : 1
-master_mem : 256
-master_cpus: 1
-slave_mem  : 512
-slave_cpus : 2
+zk_mem      : 256
+zk_cpus     : 1
+master_mem  : 256
+master_cpus : 1
+slave_mem   : 512
+slave_cpus  : 2
 
 ## private ip bases
 ## When ec2, this should be matched with
@@ -116,19 +116,19 @@ You have to configure some additional stuffs in `cluster.yml` which are related 
 ##       limit of the elastic ips is no less than (zk_n + master_n + slave_n).
 ## In EC2, the limit default is 5.
 ########################
-access_key_id:  EDIT_HERE
-secret_access_key: EDIT_HERE
-default_vpc: true                  # default vpc or not.
-subnet_id: EDIT_HERE               # VPC subnet id
-security_groups: ["EDIT_HERE"]     # array of VPN security groups. e.g. ['sg*** ']
-keypair_name: EDIT_HERE
+access_key_id       :  EDIT_HERE
+secret_access_key   : EDIT_HERE
+default_vpc         : true              # default vpc or not.
+subnet_id           : EDIT_HERE         # VPC subnet id
+security_groups     : ["EDIT_HERE"]     # array of VPN security groups. e.g. ['sg*** ']
+keypair_name        : EDIT_HERE
 ssh_private_key_path: EDIT_HERE
-region: EDIT_HERE
+region              : EDIT_HERE
 
 ## see http://aws.amazon.com/ec2/instance-types/#selecting-instance-types
-zk_instance_type: m1.small
+zk_instance_type    : m1.small
 master_instance_type: m1.small
-slave_instance_type: m1.small
+slave_instance_type : m1.small
 ```
 
 ##### Launch Cluster
