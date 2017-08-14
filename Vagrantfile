@@ -1,5 +1,5 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+## -*- mode: ruby -*-
+## vi: set ft=ruby :
 require 'yaml'
 require './lib/gen_node_infos'
 require './lib/predicates'
@@ -12,25 +12,26 @@ def is_plugin(name)
     exit(1)
   end
 end
-base_dir = File.expand_path(File.dirname(__FILE__))
-conf = YAML.load_file(File.join(base_dir, "cluster.yml"))
-ninfos = gen_node_infos(conf)
+
+base_dir  = File.expand_path(File.dirname(__FILE__))
+conf      = YAML.load_file(File.join(base_dir, "cluster.yml"))
+ninfos    = gen_node_infos(conf)
 
 ## vagrant plugins required:
-# vagrant-aws, vagrant-berkshelf, vagrant-omnibus, vagrant-hosts, vagrant-cachier
+## vagrant-aws, vagrant-berkshelf, vagrant-omnibus, vagrant-hosts, vagrant-cachier
 Vagrant.configure("2") do |config|
   if !conf["custom_ami"] then
-    # https://vagrantcloud.com/ehime/boxes/mesos
+    ## https://vagrantcloud.com/ehime/boxes/mesos
     config.vm.box = "ehime/mesos"
   end
 
-  # enable plugins
+  ## enable plugins
   config.berkshelf.enabled = true
   config.berkshelf.berksfile_path ="./Berksfile"
   config.omnibus.chef_version = :latest
 
-  # if you want to use vagrant-cachier,
-  # please install vagrant-cachier plugin.
+  ## if you want to use vagrant-cachier,
+  ## please install vagrant-cachier plugin.
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.enable :apt
     config.cache.enable :chef
@@ -40,7 +41,7 @@ Vagrant.configure("2") do |config|
   is_plugin("vagrant-omnibus")
   is_plugin("vagrant-hosts")
 
-  # define VMs. all VMs have identical configuration.
+  ## define VMs. all VMs have identical configuration.
   [ninfos[:zk], ninfos[:master], ninfos[:slave]].flatten.each_with_index do |ninfo, i|
     config.vm.define ninfo[:hostname] do |cfg|
 
@@ -74,7 +75,7 @@ Vagrant.configure("2") do |config|
             aws.ami = conf["custom_ami"]
         end
 
-        # workaround for https://github.com/mitchellh/vagrant-aws/issues/275
+        ## workaround for https://github.com/mitchellh/vagrant-aws/issues/275
         aws.ami=""
 
         aws.instance_type = ninfo[:instance_type]
@@ -102,7 +103,7 @@ Vagrant.configure("2") do |config|
             PUBLIC_DNS=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
             hostname $PUBLIC_DNS
             echo $PUBLIC_DNS > /etc/hostname
-            HOSTNAME=$PUBLIC_DNS  # Fix the bash built-in hostname variable too
+            HOSTNAME=$PUBLIC_DNS  ## Fix the bash built-in hostname variable too
             SCRIPT
         end
 
@@ -115,14 +116,14 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      # mesos-master doesn't create its work_dir.
+      ## mesos-master doesn't create its work_dir.
       master_work_dir = "/var/run/mesos"
       if master?(ninfo[:hostname]) then
         cfg.vm.provision :shell, :inline => "mkdir -p #{master_work_dir}"
       end
 
       cfg.vm.provision :chef_solo do |chef|
-#       chef.log_level = :debug
+##       chef.log_level = :debug
         chef.add_recipe "apt"
 
         if master?(ninfo[:hostname]) then
@@ -185,8 +186,8 @@ Vagrant.configure("2") do |config|
         SCRIPT
       end
 
-      # If you wanted use `.dockercfg` file
-      # Please place the file simply on this directory
+      ## If you wanted use `.dockercfg` file
+      ## Please place the file simply on this directory
       if File.exist?(".dockercfg")
         config.vm.provision :shell, :priviledged => true, :inline => <<-SCRIPT
           cp /vagrant/.dockercfg /root/.dockercfg
@@ -229,7 +230,7 @@ Vagrant.configure("2") do |config|
           aws.ami = conf["custom_ami"]
         end
 
-        # workaround for https://github.com/mitchellh/vagrant-aws/issues/275
+        ## workaround for https://github.com/mitchellh/vagrant-aws/issues/275
         aws.ami=""
 
         aws.instance_type = conf["marathon_instance_type"]
@@ -256,7 +257,7 @@ Vagrant.configure("2") do |config|
           PUBLIC_DNS=`wget -q -O - http://169.254.169.254/latest/meta-data/public-hostname`
           hostname $PUBLIC_DNS
           echo $PUBLIC_DNS > /etc/hostname
-          HOSTNAME=$PUBLIC_DNS  # Fix the bash built-in hostname variable too
+          HOSTNAME=$PUBLIC_DNS  ## Fix the bash built-in hostname variable too
           SCRIPT
       end
 
@@ -268,15 +269,15 @@ Vagrant.configure("2") do |config|
 
       if conf["chronos_enable"] then
         cfg.vm.provision :shell, :privileged => true, :inline => <<-SCRIPT
-          # Install and run Chronos based on:
-          # https://mesosphere.io/learn/run-chronos-on-mesos/
+          ## Install and run Chronos based on:
+          ## https://mesosphere.io/learn/run-chronos-on-mesos/
           mkdir -p /var/log/chronos
           LIBPROCESS_IP=#{marathon_ip} nohup /opt/chronos/bin/start-chronos.bash --master #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --zk_hosts #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --http_port 8081 > /var/log/chronos/nohup.log 2> /var/log/chronos/nohup.log < /dev/null &
           SCRIPT
       end
 
-      # If you wanted use `.dockercfg` file
-      # Please place the file simply on this directory
+      ## If you wanted use `.dockercfg` file
+      ## Please place the file simply on this directory
       if File.exist?(".dockercfg")
         config.vm.provision :shell, :priviledged => true, :inline => <<-SCRIPT
           cp /vagrant/.dockercfg /root/.dockercfg
