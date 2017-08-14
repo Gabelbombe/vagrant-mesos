@@ -24,16 +24,12 @@ Base boxes used in `Vagrantfile`s are Mesos pre-installed boxes,
 * VirtualBox: <https://www.virtualbox.org/> (not required if you use ec2.)
 * Vagrant plugins
     * [vagrant-omnibus](https://github.com/schisamo/vagrant-omnibus)
-          `$ vagrant plugin install vagrant-omnibus`
-    * [vagrant-berkshelf](https://github.com/berkshelf/vagrant-berkshelf) (>=4.0.0)
-          `$ vagrant plugin install vagrant-berkshelf`
-		* To use vagrant-berkself, you will have to install [ChefDK](https://downloads.chef.io/chef-dk/).
+    * [vagrant-berkshelf](https://github.com/berkshelf/vagrant-berkshelf) (>=4.0.0) [NOTE: To use vagrant-berkself, you will have to install [ChefDK](https://downloads.chef.io/chef-dk/)]
     * [vagrant-hosts](https://github.com/adrienthebo/vagrant-hosts)
-          `$ vagrant plugin install vagrant-hosts`
     * [vagrant-cachier](https://github.com/fgrehm/vagrant-cachier)(optional)
-          `$ vagrant plugin install vagrant-cachier`
     * [vagrant-aws](https://github.com/mitchellh/vagrant-aws) (only if you use ec2.)
-    	   `$ vagrant plugin install vagrant-aws`
+
+To install the above requirements you can simply run [This Installer Script](https://github.com/ehime/vagrant-mesos/blob/master/vagrant_plugin_installer.sh)
 
 <a name="clvb"></a>
 #### Mesos Cluster on VirtualBox
@@ -43,30 +39,30 @@ Cluster Configuration is defined at  `cluster.yml`.  You can edit the file to co
 
 ```bash
 ## Mesos cluster configurations
-mesos_version: 0.22.1
+mesos_version : 0.22.1
 
 ## The numbers of servers
 ##############################
-zk_n        : 1    # hostname will be zk1, zk2, …
-master_n    : 1    # hostname will be master1,master2,…
-slave_n     : 1    # hostname will be slave1,slave2,…
+zk_n          : 1    # hostname will be zk1, zk2, …
+master_n      : 1    # hostname will be master1,master2,…
+slave_n       : 1    # hostname will be slave1,slave2,…
 
 ## Memory and Cpus setting(only for virtualbox)
 ##########################################
-zk_mem      : 256
-zk_cpus     : 1
-master_mem  : 256
-master_cpus : 1
-slave_mem   : 512
-slave_cpus  : 2
+zk_mem        : 256
+zk_cpus       : 1
+master_mem    : 256
+master_cpus   : 1
+slave_mem     : 512
+slave_cpus    : 2
 
 ## private ip bases
 ## When ec2, this should be matched with
 ## private addresses defined by subnet_id below.
 ################################################
-zk_ipbase    : "172.31.0."
-master_ipbase: "172.31.1."
-slave_ipbase : "172.31.2."
+zk_ipbase     : "172.31.0."
+master_ipbase : "172.31.1."
+slave_ipbase  : "172.31.2."
 ```
 
 
@@ -74,7 +70,6 @@ slave_ipbase : "172.31.2."
 This takes several minutes(10 to 20 min.).  It's time to go grabbing some coffee.
 
 ```bash
-$ cd multinodes
 $ vagrant up
 ```
 
@@ -88,7 +83,6 @@ At default setting, after all the boxes are up, you can see services running at:
 this operations all VM instances forming the cluster.
 
 ```bash
-$ cd multinodes
 $ vagrant destroy
 ```
 
@@ -116,26 +110,25 @@ You have to configure some additional stuffs in `cluster.yml` which are related 
 ##       limit of the elastic ips is no less than (zk_n + master_n + slave_n).
 ## In EC2, the limit default is 5.
 ########################
-access_key_id       :  EDIT_HERE
-secret_access_key   : EDIT_HERE
-default_vpc         : true              # default vpc or not.
-subnet_id           : EDIT_HERE         # VPC subnet id
-security_groups     : ["EDIT_HERE"]     # array of VPN security groups. e.g. ['sg*** ']
-keypair_name        : EDIT_HERE
-ssh_private_key_path: EDIT_HERE
-region              : EDIT_HERE
+access_key_id         : EDIT_HERE
+secret_access_key     : EDIT_HERE
+default_vpc           : true              # default vpc or not.
+subnet_id             : EDIT_HERE         # VPC subnet id
+security_groups       : ["EDIT_HERE"]     # array of VPN security groups. e.g. ['sg*** ']
+keypair_name          : EDIT_HERE
+ssh_private_key_path  : EDIT_HERE
+region                : EDIT_HERE
 
 ## see http://aws.amazon.com/ec2/instance-types/#selecting-instance-types
-zk_instance_type    : m1.small
-master_instance_type: m1.small
-slave_instance_type : m1.small
+zk_instance_type      : m1.small
+master_instance_type  : m1.small
+slave_instance_type   : m1.small
 ```
 
 ##### Launch Cluster
 After editing configuration is done, you can just hit regular command.
 
 ```bash
-$ cd multinode
 $ vagrant up --provider=aws --no-parallel
 ```
 
@@ -143,9 +136,9 @@ _NOTE: `--no-parallel` is highly recommended because vagrant-berkshelf plugin is
 
 After instances are all up, you can see
 
-* [Mesos](https://github.com/apache/mesos) Web UI on: `http://#_public_dns_of_the_master_N_#:5050`
+* [Mesos](https://github.com/apache/mesos) Web UI on:           `http://#_public_dns_of_the_master_N_#:5050`
 * [Marathon](https://github.com/mesosphere/marathon) Web UI on: `http://#_public_dns_of_marathon_#:8080`
-* [Chronos](https://github.com/mesos/chronos) Web UI on: `http://#_public_dns_of_chronos#:8081`
+* [Chronos](https://github.com/mesos/chronos) Web UI on:        `http://#_public_dns_of_chronos#:8081`
 
 if everything went well.
 
@@ -159,7 +152,6 @@ http://ec2-54-193-24-154.us-west-1.compute.amazonaws.com:5050
 If you wanted to make sure that the specific mastar(e.g. `master1`) could be an initial leader, you can cotrol the order of spinning up VMs like below.
 
 ```bash
-$ cd multinode
 # spin up an zookeeper ensemble
 $ vagrant up --provider=aws /zk/
 
@@ -178,13 +170,11 @@ $ vagrant up --provider=aws marathon
 
 ##### Stop your Cluster
 ```bash
-$ cd multinodes
 $ vagrant halt
 ```
 
 ##### Resume your Cluster
 ```bash
-$ cd multinodes
 $ vagrant reload --provision
 ```
 
@@ -192,6 +182,5 @@ $ vagrant reload --provision
 This operations terminates all VMs instances forming the cluster.
 
 ```bash
-$ cd multinodes
 $ vagrant destroy
 ```
