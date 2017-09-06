@@ -126,16 +126,25 @@ Vagrant.configure("2") do | config |
       cfg.vm.provision :chef_solo do | chef |
 ##       chef.log_level = :debug
         chef.add_recipe "apt"
-
         if master?(ninfo[:hostname]) then
           chef.add_recipe "mesos::master"
           chef.json  = {
             :mesos=> {
-              :type         => "mesosphere",
-              :version      => conf["mesos_version"],
-              :master_ips   => ninfos[:master].map { |m| "#{m[:ip]}" },
-              :slave_ips    => ninfos[:slave].map { | s | "#{s[:ip]}" },
-              :master       => if ninfos[:zk].length > 0 then
+              :type          => "mesosphere",
+              :version       => conf["mesos_version"],
+              :master_ips    => ninfos[:master].map { |m| "#{m[:ip]}" },
+              :slave_ips     => ninfos[:slave].map { | s | "#{s[:ip]}" },
+              :mesosphere    => if conf["mesos_build"].length > 0 then
+                {
+                  :build_version => conf["mesos_build"]
+                }
+              else
+                {
+                  :build_version => ""
+                }
+              end,
+
+              :master        => if ninfos[:zk].length > 0 then
                 {
                   :cluster  => "MyCluster",
                   :quorum   => "#{(ninfos[:master].length.to_f/2).ceil}",
@@ -159,6 +168,17 @@ Vagrant.configure("2") do | config |
             :mesos => {
               :type         => "mesosphere",
               :version      => conf["mesos_version"],
+
+              :mesosphere    => if conf["mesos_build"].length > 0 then
+                {
+                  :build_version => conf["mesos_build"]
+                }
+              else
+                {
+                  :build_version => ''
+                }
+              end,
+
               :slave        => {
                 :master         => if ninfos[:zk].length > 0 then
                                     "zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(", ")+"/mesos"
