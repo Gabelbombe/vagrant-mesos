@@ -230,6 +230,18 @@ Vagrant.configure("2") do | config |
         vb.name = 'vagrant-mesos-' + "marathon"
         vb.customize ["modifyvm", :id, "--memory", conf["marathon_mem"], "--cpus", conf["marathon_cpus"] ]
 
+
+        if conf["marathon_version"] !=  '0.8.2'
+          override.vm.provision :shell , :inline => <<-SCRIPT
+            apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+            DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
+            CODENAME=$(lsb_release -cs)
+            echo "deb http://repos.mesosphere.com/${DISTRO} ${CODENAME} main" |sudo tee /etc/apt/sources.list.d/mesosphere.list
+            apt-get -y update && apt-get install marathon=$(apt-cache madison marathon |grep '0.8.2' |awk -F'|' '{print$2}' |tr -d' ')
+            SCRIPT
+        end
+
+
         override.vm.provision :shell do | s |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/root root"
@@ -239,6 +251,8 @@ Vagrant.configure("2") do | config |
           s.path = "scripts/populate_sshkey.sh"
           s.args = "/home/vagrant vagrant"
         end
+
+
       end
 
       cfg.vm.provider :aws do | aws, override |
@@ -287,6 +301,7 @@ Vagrant.configure("2") do | config |
         mkdir -p /var/log/marathon
         kill -KILL `ps augwx | grep marathon | tr -s " " | cut -d' ' -f2`
         LIBPROCESS_IP=#{marathon_ip} nohup /opt/marathon/bin/start --master #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --zk_hosts #{ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")} --event_subscriber http_callback > /var/log/marathon/nohup.log 2> /var/log/marathon/nohup.log < /dev/null &
+        echo LIBPROCESS_IP=#{marathon_ip} nohup /opt/marathon/bin/start --master #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --zk_hosts #{ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")} --event_subscriber http_callback >| ~/marathon.runner
         SCRIPT
 
       if conf["chronos_enable"] then
@@ -295,6 +310,7 @@ Vagrant.configure("2") do | config |
           ## https://mesosphere.io/learn/run-chronos-on-mesos/
           mkdir -p /var/log/chronos
           LIBPROCESS_IP=#{marathon_ip} nohup /opt/chronos/bin/start-chronos.bash --master #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --zk_hosts #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --http_port 8081 > /var/log/chronos/nohup.log 2> /var/log/chronos/nohup.log < /dev/null &
+          echo LIBPROCESS_IP=#{marathon_ip} nohup /opt/chronos/bin/start-chronos.bash --master #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --zk_hosts #{"zk://"+ninfos[:zk].map{|zk| zk[:ip]+":2181"}.join(",")+"/mesos"} --http_port 8081 >| ~/chronos.runner
           SCRIPT
       end
 
