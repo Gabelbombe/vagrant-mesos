@@ -149,7 +149,7 @@ $ vagrant ssh master1 -- 'echo http://`curl --silent http://169.254.169.254/late
 http://ec2-54-193-24-154.us-west-1.compute.amazonaws.com:5050
 ```
 
-If you wanted to make sure that the specific mastar(e.g. `master1`) could be an initial leader, you can cotrol the order of spinning up VMs like below.
+If you wanted to make sure that a specific master (e.g. `master1`) will be the initial leader, you can control the order of spinning up VMs like below.
 
 ```bash
 # spin up an zookeeper ensemble
