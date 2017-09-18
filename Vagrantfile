@@ -230,15 +230,24 @@ Vagrant.configure("2") do | config |
         vb.name = 'vagrant-mesos-' + "marathon"
         vb.customize ["modifyvm", :id, "--memory", conf["marathon_mem"], "--cpus", conf["marathon_cpus"] ]
 
-
-        if conf["marathon_version"] !=  '0.8.2'
+        if conf["marathon_version"] != "0.8.2" and conf["marathon_version"] != ""
           override.vm.provision :shell , :inline => <<-SCRIPT
-            apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+
             DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
             CODENAME=$(lsb_release -cs)
-            echo "deb http://repos.mesosphere.com/${DISTRO} ${CODENAME} main" |sudo tee /etc/apt/sources.list.d/mesosphere.list
-            apt-get -y update && apt-get install marathon=$(apt-cache madison marathon |grep '0.8.2' |awk -F'|' '{print$2}' |tr -d' ')
-            SCRIPT
+            echo "deb http://repos.mesosphere.com/${DISTRO} ${CODENAME} main" |\
+            sudo tee /etc/apt/sources.list.d/mesosphere.list
+
+            sudo apt-get -y install equivs
+            equivs-control dummy-jdk-8u91
+            echo -e "### Commented entries have reasonable defaults.\n### Uncomment to edit them.\nSection: misc\nPriority: optional\nStandards-Version: 3.9.2\n\nPackage: dummy-oracle-jdk\nVersion: 1.8.91\nProvides: java8-runtime-headless,default-jre-headless,java-runtime-headless\nDescription: dummy package to satisfy java8-runtime-headless dep for manual install\n long description and info\n .\n second paragraph" >| dummy-jdk-8u91
+            equivs-build dummy-jdk-8u91
+            sudo dpkg -i dummy-oracle-jdk_1.8.91_all.deb
+
+            sudo apt-get -y update
+            sudo apt-get install -y marathon=$(apt-cache madison marathon |grep #{conf["marathon_version"]} |awk -F'|' '{print$2}' |tr -d ' ')
+          SCRIPT
         end
 
 

@@ -184,3 +184,22 @@ This operations terminates all VMs instances forming the cluster.
 ```bash
 $ vagrant destroy
 ```
+
+<a name="ctst1"></a>
+#### Testing and upgrading binary packages for compatibility
+
+###### Basic command for tearing down a stack
+
+In order to test a clean build run the following, this will completely tear down the stack and replay it.
+
+```bash
+vagrant destroy --force ; vagrant up --provider=virtualbox
+```
+
+If you would like to remove and reissue only a portion of the stack you can use the folllowing as well.
+
+```bash
+vagrant destroy /zk/ --force ; vagrant up /zk/ --provider=virtualbox
+```
+
+This will destroy and rebuild the zookeeper ensemble. Please note though that when removing portions of the stack that you will need to re-apply any hook or registration that is required by the infrastructure.
