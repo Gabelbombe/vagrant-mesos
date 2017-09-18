@@ -35,6 +35,7 @@ Vagrant.configure("2") do | config |
   ## please install vagrant-cachier plugin.
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.enable :apt
+    config.cache.enable :yum
     config.cache.enable :chef
   end
 
